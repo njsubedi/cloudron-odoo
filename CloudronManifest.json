@@ -1,0 +1,31 @@
+{
+  "manifestVersion": 2,
+  "id": "com.odoo.cloudronapp",
+  "website": "https://www.odoo.com",
+  "contactEmail": "support@odoo.com",
+  "title": "Odoo",
+  "author": "Odoo authors",
+  "tagline": "Open Source ERP and CRM",
+  "version": "15.0",
+  "icon": "manifest/logo.png",
+  "description": "file://manifest/DESCRIPTION.md",
+  "changelog": "file://manifest/CHANGELOG.md",
+  "postInstallMessage": "file://manifest/POSTINSTALL.md",
+  "healthCheckPath": "/",
+  "httpPort": 80,
+  "memoryLimit": 2684354560,
+  "addons": {
+    "localstorage": {},
+    "postgresql": {},
+    "sendmail": {},
+    "ldap": {}
+  },
+  "tags": [
+    "auth"
+  ],
+  "optionalSso": true,
+  "mediaLinks": [],
+  "forumUrl": "https://forum.cloudron.io/",
+  "documentationUrl": "https://docs.cloudron.io/"
+}
+

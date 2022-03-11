@@ -1,0 +1,3 @@
+[options]
+addons_path = /app/code/addons,/app/data/extra-addons
+data_dir = /app/data/odoo
