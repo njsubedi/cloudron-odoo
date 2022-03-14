@@ -19,11 +19,15 @@ RUN curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releas
 RUN npm install -g rtlcss
 
 # Install Odoo
-ENV ODOO_VERSION 15.0
+ARG ODOO_VERSION=15.0
+ARG ODOO_COMMIT_HASH=f07c63d3e4135d658bb952f1b4880e97d0b66992
 
-RUN curl -L https://github.com/odoo/odoo/archive/refs/heads/$ODOO_VERSION.tar.gz | tar zx --strip-components 1 -C /app/code && \
+RUN curl -L https://github.com/odoo/odoo/archive/${ODOO_COMMIT_HASH}.tar.gz | tar zx --strip-components 1 -C /app/code && \
     pip3 install wheel && \
     pip3 install -r requirements.txt
+
+# Patch Odoo to prevent connecting to the default database named 'postgres' every now and then.
+RUN  sed -i.bak "748i\    to = tools.config['db_name']" /app/code/odoo/sql_db.py
 
 RUN rm -rf /var/log/nginx && mkdir /run/nginx && ln -s /run/nginx /var/log/nginx
 
