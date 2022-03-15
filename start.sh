@@ -26,10 +26,13 @@ if [[ ! -f /app/data/odoo.conf ]]; then
   echo "Initialized successfully."
 
   echo "Adding required tables/relations for mail settings."
-  pg_cli "INSERT INTO public.res_config_settings (create_uid, create_date, write_uid, write_date, company_id, user_default_rights, external_email_server_default, module_base_import, module_google_calendar, module_microsoft_calendar, module_mail_plugin, module_google_drive, module_google_spreadsheet, module_auth_oauth, module_auth_ldap, module_base_gengo, module_account_inter_company_rules, module_pad, module_voip, module_web_unsplash, module_partner_autocomplete, module_base_geolocalize, module_google_recaptcha, group_multi_currency, show_effect, profiling_enabled_until, module_product_images, unsplash_access_key, fail_counter, alias_domain, restrict_template_rendering, use_twilio_rtc_servers, twilio_account_sid, twilio_account_token, auth_signup_reset_password, auth_signup_uninvited, auth_signup_template_user_id) VALUES (2, 'NOW()', 2, 'NOW()', 1, false, true, true, false, false, false, false, false, false, true, false, false, false, false, true, true, false, false, false, true, NULL, false, NULL, 0, '$CLOUDRON_APP_DOMAIN', false, false, NULL, NULL, false, 'b2c', 5) ON CONFLICT (id) DO NOTHING;"
+  pg_cli "INSERT INTO public.res_config_settings (create_uid, create_date, write_uid, write_date, company_id, user_default_rights, external_email_server_default, module_base_import, module_google_calendar, module_microsoft_calendar, module_mail_plugin, module_google_drive, module_google_spreadsheet, module_auth_oauth, module_auth_ldap, module_base_gengo, module_account_inter_company_rules, module_pad, module_voip, module_web_unsplash, module_partner_autocomplete, module_base_geolocalize, module_google_recaptcha, group_multi_currency, show_effect, profiling_enabled_until, module_product_images, unsplash_access_key, fail_counter, alias_domain, restrict_template_rendering, use_twilio_rtc_servers, twilio_account_sid, twilio_account_token, auth_signup_reset_password, auth_signup_uninvited, auth_signup_template_user_id) VALUES (2, 'NOW()', 2, 'NOW()', 1, false, true, true, false, false, false, false, false, false, true, false, false, false, false, true, true, false, false, false, true, NULL, false, NULL, 0, '$CLOUDRON_APP_DOMAIN', false, false, NULL, NULL, false, 'b2b', 5) ON CONFLICT (id) DO NOTHING;"
 
   pg_cli "INSERT INTO public.ir_config_parameter (key, value, create_uid, create_date, write_uid, write_date) VALUES ('base_setup.default_external_email_server', 'True', 2, 'NOW()', 2, 'NOW()');"
   pg_cli "INSERT INTO public.ir_config_parameter (key, value, create_uid, create_date, write_uid, write_date) VALUES ('mail.catchall.domain', '$CLOUDRON_APP_DOMAIN', 2, 'NOW()', 2, 'NOW()');"
+
+  echo "Disabling public sign-up..."
+  pg_cli "UPDATE public.ir_config_parameter SET value='b2b' WHERE key='auth_signup.invitation_scope';";
 
   echo "Copying default configuration file to /app/data/odoo.conf..."
   cp /app/pkg/odoo.conf.sample /app/data/odoo.conf
@@ -99,7 +102,7 @@ if [[ -z "${CLOUDRON_LDAP_SERVER+x}" ]]; then
   pg_cli "DELETE FROM public.res_company_ldap WHERE id = 1 AND company = 1"
 else
   echo "LDAP is enabled. Adding values to config."
-  pg_cli "INSERT INTO public.res_company_ldap (id, sequence, company, ldap_server, ldap_server_port, ldap_binddn, ldap_password, ldap_filter, ldap_base, \"user\", create_user, ldap_tls, create_uid, create_date, write_uid, write_date) VALUES (1, 10, 1, '$CLOUDRON_LDAP_SERVER', $CLOUDRON_LDAP_PORT, '$CLOUDRON_LDAP_BIND_DN', '$CLOUDRON_LDAP_BIND_PASSWORD', '(objectclass=user)', '$CLOUDRON_LDAP_USERS_BASE_DN', NULL, true, false, 2, 'NOW()', 2, 'NOW()') ON CONFLICT (id) DO NOTHING;;"
+  pg_cli "INSERT INTO public.res_company_ldap (id, sequence, company, ldap_server, ldap_server_port, ldap_binddn, ldap_password, ldap_filter, ldap_base, \"user\", create_user, ldap_tls, create_uid, create_date, write_uid, write_date) VALUES (1, 10, 1, '$CLOUDRON_LDAP_SERVER', $CLOUDRON_LDAP_PORT, '$CLOUDRON_LDAP_BIND_DN', '$CLOUDRON_LDAP_BIND_PASSWORD', '(&(objectclass=user)(mail=%s))', '$CLOUDRON_LDAP_USERS_BASE_DN', NULL, true, false, 2, 'NOW()', 2, 'NOW()') ON CONFLICT (id) DO NOTHING;;"
 fi
 
 # Start nginx process

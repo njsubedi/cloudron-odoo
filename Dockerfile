@@ -29,6 +29,9 @@ RUN curl -L https://github.com/odoo/odoo/archive/${ODOO_COMMIT_HASH}.tar.gz | ta
 # Patch Odoo to prevent connecting to the default database named 'postgres' every now and then.
 RUN  sed -i.bak "748i\    to = tools.config['db_name']" /app/code/odoo/sql_db.py
 
+# Properly map the LDAP attribute 'displayname' instead of 'cn' to the display name of the logged in user.
+RUN  sed -i.bak "194s/'cn'/'displayname'/" /app/code/addons/auth_ldap/models/res_company_ldap.py
+
 RUN rm -rf /var/log/nginx && mkdir /run/nginx && ln -s /run/nginx /var/log/nginx
 
 # Copy entrypoint script and Odoo configuration file
