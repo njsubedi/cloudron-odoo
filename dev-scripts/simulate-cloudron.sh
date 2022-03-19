@@ -2,7 +2,7 @@ if [[ -z "${CLOUDRON+x}" ]]; then
   echo "Not Cloudron. Setting testing vars..."
   export CLOUDRON_POSTGRESQL_PORT=5432
   export CLOUDRON_POSTGRESQL_HOST=172.17.0.1
-  export CLOUDRON_POSTGRESQL_DATABASE=odoo
+  export CLOUDRON_POSTGRESQL_DATABASE=odootest
   export CLOUDRON_POSTGRESQL_USERNAME=odoo_user
   export CLOUDRON_POSTGRESQL_PASSWORD=odoo_password
 

@@ -32,7 +32,7 @@ if [[ ! -f /app/data/odoo.conf ]]; then
   pg_cli "INSERT INTO public.ir_config_parameter (key, value, create_uid, create_date, write_uid, write_date) VALUES ('mail.catchall.domain', '$CLOUDRON_APP_DOMAIN', 2, 'NOW()', 2, 'NOW()');"
 
   echo "Disabling public sign-up..."
-  pg_cli "UPDATE public.ir_config_parameter SET value='b2b' WHERE key='auth_signup.invitation_scope';";
+  pg_cli "UPDATE public.ir_config_parameter SET value='b2b' WHERE key='auth_signup.invitation_scope';"
 
   echo "Copying default configuration file to /app/data/odoo.conf..."
   cp /app/pkg/odoo.conf.sample /app/data/odoo.conf
@@ -108,10 +108,18 @@ fi
 # Start nginx process
 sed -e "s,__REPLACE_WITH_CLOUDRON_APP_DOMAIN__,${CLOUDRON_APP_DOMAIN}," /app/pkg/nginx.conf >/run/nginx/nginx.conf
 
+if [[ ! -f /app/data/nginx-custom-locations.conf ]]; then
+  cat >/app/data/nginx-custom-locations.conf <<EOF
+# Content of this file is included inside the server { } block.
+# Add custom locations except "/" and "/longpolling" as they are reserved for Odoo.
+# Or add custom directives. See https://nginx.org/en/docs/http/ngx_http_core_module.html#server
+EOF
+fi
+
 chown -R cloudron:cloudron /app/data
 
 echo "=> Start nginx"
-rm -f /run/nginx/nginx.pid
+rm -f /run/nginx.pid
 
 nginx -c /run/nginx/nginx.conf &
 # Done nginx
